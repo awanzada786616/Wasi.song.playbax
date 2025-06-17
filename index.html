@@ -1,67 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Wasi Song Tube</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: linear-gradient(to right, #3f2b96, #a8c0ff);
-      color: #fff;
-      text-align: center;
-      padding: 20px;
-    }
-    h1 {
-      font-size: 3em;
-    }
-    .player {
-      margin-top: 30px;
-    }
-    input[type="text"] {
-      padding: 10px;
-      width: 80%;
-      border-radius: 10px;
-      border: none;
-      font-size: 1em;
-    }
-    button {
-      padding: 10px 20px;
-      background: #ff4e50;
-      color: white;
-      border: none;
-      border-radius: 10px;
-      font-size: 1em;
-      margin-left: 10px;
-    }
+    body {margin:0;padding:0;font-family:Arial,sans-serif;background:#121212;color:#fff;transition:background .3s,color .3s;}
+    .light {background:#f4f4f4;color:#111;}
+    header {padding:20px;text-align:center;font-size:2.5rem;background:linear-gradient(to right,#ff6a00,#ee0979);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+    .topbar {display:flex;justify-content:center;gap:10px;padding:15px;}
+    input {padding:10px;width:60%;max-width:400px;border:none;border-radius:8px;font-size:1rem;}
+    button {padding:10px 16px;border:none;border-radius:8px;background:#ff6a00;color:#fff;cursor:pointer;}
+    .loader {display:none;text-align:center;padding:20px;color:#ff6a00;}
+    .cards {display:flex;flex-wrap:wrap;justify-content:center;gap:20px;padding:20px;}
+    .card {width:320px;border-radius:10px;overflow:hidden;background:rgba(255,255,255,0.05);}
+    .card iframe {width:100%;height:180px;border:none;}
+    footer {padding:20px;text-align:center;font-size:0.9rem;color:#888;}
+    .whatsapp {position:fixed;bottom:20px;right:20px;background:#25D366;padding:10px 15px;border-radius:50px;color:#fff;text-decoration:none;font-weight:bold;}
   </style>
 </head>
 <body>
-  <h1>Wasi Song Tube</h1>
-  <div class="search">
-    <input type="text" id="searchInput" placeholder="Type a song name..." />
-    <button onclick="searchSong()">Search</button>
+  <header>Wasi Song Tube</header>
+  <div class="topbar">
+    <input id="query" placeholder="Search songs..." onkeydown="if(event.key==='Enter') searchVideos()" />
+    <button onclick="searchVideos()">Search</button>
+    <button onclick="toggleTheme()">🌗 Theme</button>
   </div>
-  <div class="player" id="playerArea">
-    <audio id="audioPlayer" controls autoplay>
-      <source id="songSrc" src="songs/sample.mp3" type="audio/mpeg">
-      Your browser does not support the audio element.
-    </audio>
-  </div>
+  <div id="loader" class="loader">Loading...</div>
+  <div id="cards" class="cards"></div>
+  <footer>WhatsApp: +923175768178 • Built by Wasi</footer>
+  <a class="whatsapp" href="https://wa.me/923175768178" target="_blank">💬 WhatsApp</a>
 
   <script>
-    function searchSong() {
-      const input = document.getElementById('searchInput').value.toLowerCase();
-      const audio = document.getElementById('audioPlayer');
-      const source = document.getElementById('songSrc');
-      if (input.includes("posoori")) {
-        source.src = "songs/posoori.mp3";
-      } else {
-        source.src = "songs/sample.mp3";
+    const apiKey = 'AIzaSyBylc48brJYEjlKgT0nfOji0f_3MI_nxIs';
+    function toggleTheme(){document.body.classList.toggle('light');}
+
+    async function searchVideos(queryParam) {
+      const query = queryParam || document.getElementById('query').value.trim();
+      if (!query) return alert('Please enter a search term.');
+
+      document.getElementById('loader').style.display='block';
+      document.getElementById('cards').innerHTML='';
+
+      try {
+        const res = await fetch(
+          `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=8&type=video&q=${encodeURIComponent(query)}&key=${apiKey}`
+        );
+        const data = await res.json();
+        document.getElementById('loader').style.display='none';
+        if (!data.items || data.items.length === 0) return alert('No results found.');
+
+        data.items.forEach(item => {
+          const vid = item.id.videoId;
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.innerHTML = `
+            <iframe src="https://www.youtube.com/embed/${vid}" allowfullscreen></iframe>
+            <h4 style="padding:10px;">${item.snippet.title}</h4>
+          `;
+          document.getElementById('cards').appendChild(card);
+        });
+      } catch (err) {
+        console.error(err);
+        document.getElementById('loader').style.display = 'none';
+        alert('An error occurred. Please try again.');
       }
-      audio.load();
-      audio.play();
     }
+
+    // Load trending default searches
+    window.onload = () => {
+      searchVideos('Latest Pakistani Songs');
+    };
   </script>
+
+  <script src="//code.tidio.co/v6flfnabuyblfkrginqkly19wazdskhc.js" async></script>
 </body>
 </html>
