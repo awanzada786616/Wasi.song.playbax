@@ -17,10 +17,38 @@
     .card iframe {width:100%;height:180px;border:none;}
     footer {padding:20px;text-align:center;font-size:0.9rem;color:#888;}
     .whatsapp {position:fixed;bottom:20px;right:20px;background:#25D366;padding:10px 15px;border-radius:50px;color:#fff;text-decoration:none;font-weight:bold;}
-  </style>
+  
+    .card iframe { width: 100%; height: 180px; transition: all 0.3s ease; }
+    .card.active iframe { height: 400px; }
+    
+    .logo {
+      font-size: 2.2rem;
+      vertical-align: middle;
+      margin-right: 10px;
+    }
+    .animated-title {
+      font-size: 2.5rem;
+      background: linear-gradient(90deg, #ff6a00, #ee0979, #ff6a00);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: shine 3s linear infinite;
+    }
+    @keyframes shine {
+      0% { background-position: 0% center; }
+      100% { background-position: 200% center; }
+    }
+    </style>
+
+
 </head>
 <body>
-  <header>Wasi Song Tube</header>
+  
+    <header>
+      <span class="logo">🎧</span>
+      <span class="animated-title">Wasi Song Tube</span>
+    </header>
+
   <div class="topbar">
     <input id="query" placeholder="Search songs..." onkeydown="if(event.key==='Enter') searchVideos()" />
     <button onclick="searchVideos()">Search</button>
@@ -54,7 +82,7 @@
           const vid = item.id.videoId;
           const card = document.createElement('div');
           card.className = 'card';
-          card.innerHTML = `
+          card.innerHTML = `<div onclick='setActiveCard(this.parentElement)'>
             <iframe src="https://www.youtube.com/embed/${vid}" allowfullscreen></iframe>
             <h4 style="padding:10px;">${item.snippet.title}</h4>
           `;
@@ -71,8 +99,26 @@
     window.onload = () => {
       searchVideos('Latest Pakistani Songs');
     };
-  </script>
+  
+    // Function to set clicked card as active
+    function setActiveCard(cardElement) {
+      document.querySelectorAll('.card').forEach(card => {
+        card.classList.remove('active');
+      });
+      cardElement.classList.add('active');
+    }
+    </script>
 
-  <script src="//code.tidio.co/v6flfnabuyblfkrginqkly19wazdskhc.js" async></script>
+
+  <script src="//code.tidio.co/v6flfnabuyblfkrginqkly19wazdskhc.js" async>
+    // Function to set clicked card as active
+    function setActiveCard(cardElement) {
+      document.querySelectorAll('.card').forEach(card => {
+        card.classList.remove('active');
+      });
+      cardElement.classList.add('active');
+    }
+    </script>
+
 </body>
 </html>
